@@ -1,0 +1,50 @@
+//
+//  PrefixHeader.pch
+//  Weather
+//
+//  Created by guohaitao on 16/4/27.
+//  Copyright © 2016年 guohaitao. All rights reserved.
+//
+
+#ifndef PrefixHeader_pch
+#define PrefixHeader_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+
+#pragma mark--接口说明
+/*
+ 接口说明
+ 城市接口： https://api.heweather.com/x3/weather
+ 参数：
+ cityid or city or cityip
+ key：5d2fecb1e50a4b788d3d87c1f113a7f5 必传
+ */
+
+#define CityUrl @"https://api.heweather.com/x3/weather"
+
+
+#pragma mark--宏定义
+#define KViewHeight self.view.bounds.size.height
+#define KViewWidth  self.view.bounds.size.width
+#define KScreenWidth  [UIScreen mainScreen].bounds.size.width
+#define KScreenHeight  [UIScreen mainScreen].bounds.size.height
+
+
+#pragma mark--第三方库文件
+#import "AFNetworking.h"
+#import "JSONModel.h"
+#import "UIImageView+WebCache.h"
+
+
+#pragma mark--自定制NSLog
+#ifdef DEBUG
+#define debugLog(...) NSLog(__VA_ARGS__)
+#define debugMethod() NSLog(@"%s", __func__)
+#else
+#define debugLog(...)
+#define debugMethod()
+#endif
+
+#endif /* PrefixHeader_pch */
