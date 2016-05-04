@@ -33,9 +33,15 @@
 
 
 #pragma mark--第三方库文件
+
+
 #import "AFNetworking.h"
 #import "JSONModel.h"
 #import "UIImageView+WebCache.h"
+#define MAS_SHORTHAND
+#define MAS_SHORTHAND_GLOBALS
+#import "Masonry.h"
+
 
 
 #pragma mark--自定制NSLog
