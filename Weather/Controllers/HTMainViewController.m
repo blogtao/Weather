@@ -12,7 +12,7 @@
 #import "HTCustomView.h"
 #import "HTHourForcastCell.h"
 
-#define SUM 3 //城市数量
+#define SUM 1 //城市数量
 #define HourTag 20
 #define hourForcastID @"HourForcastID"
 @interface HTMainViewController ()<UIScrollViewDelegate, UITableViewDataSource, UITableViewDelegate, UICollectionViewDataSource, UICollectionViewDelegateFlowLayout>
@@ -40,7 +40,7 @@
         //关闭弹性效果
         _upScrollVw.bounces = NO;
         
-        _upScrollVw.backgroundColor = [UIColor colorWithRed:0.84 green:0.69 blue:0.45 alpha:1.00];
+        _upScrollVw.backgroundColor = [UIColor colorWithRed:0.93 green:0.90 blue:0.87 alpha:1.00];
     }
     return _upScrollVw;
 }
@@ -72,9 +72,10 @@
         subView.backgroundColor = [UIColor colorWithRed:arc4random() % 256 / 255.0 green:arc4random() % 256 / 255.0 blue:arc4random() % 256 / 255.0 alpha:.5];
         [self.upScrollVw addSubview:subView];
     }
-    UIImageView * imgView = [[UIImageView alloc] initWithFrame:CGRectMake((SUM - 1) * KViewWidth, 0, 100 , 100)];
+    UIImageView * imgView = [[UIImageView alloc] initWithFrame:CGRectMake(KViewWidth / 2 -50, 20, 100 , 100)];
     [imgView sd_setImageWithURL:[NSURL URLWithString:@"http://files.heweather.com/cond_icon/100.png"]];
 
+//    UILabel * tmpLbl = [UILabel alloc] initWithFrame:CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat height#>)
     [self.upScrollVw addSubview:imgView];
     
     
