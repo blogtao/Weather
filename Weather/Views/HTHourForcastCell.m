@@ -58,7 +58,6 @@
                    lbl.text = [str stringByAppendingString:@"级"];
                     break;
                 }
-                debugLog(@"%d %c", isdigit(c), c);
             }
         }
 //        if (i == 2) {

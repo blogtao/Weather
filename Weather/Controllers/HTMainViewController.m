@@ -24,6 +24,13 @@
 @property (nonatomic, strong) UITableView * btmTableVw; //下半部分视图
 @property (nonatomic, strong) NSArray * dataArr;//存储数据一个元素是数据，另一个元素也是数组（suggestion）
 
+
+@property (nonatomic, strong) UIImageView * codeImgView;
+@property (nonatomic, strong) UILabel * tmpLbl;
+@property (nonatomic, strong) UILabel * nowSun;
+@property (nonatomic, strong) UIButton * aqiCity;
+
+
 @end
 
 @implementation HTMainViewController
@@ -64,6 +71,44 @@
     }
     return _hourCollVw;
 }
+#pragma mark--天气图片加载
+- (UIImageView *)codeImgView{
+    if (_codeImgView == nil) {
+        _codeImgView = [[UIImageView alloc] initWithFrame:CGRectMake(KViewWidth / 2 -50, 20, 100 , 100)];
+    }
+    return _codeImgView;
+}
+#pragma mark--天气温度加载
+- (UILabel *)tmpLbl{
+    if (_tmpLbl == nil) {
+        _tmpLbl = [[UILabel alloc] initWithFrame:CGRectMake(100, 120, KViewWidth - 200, 100)];
+        _tmpLbl.font = [UIFont  systemFontOfSize:80];
+        _tmpLbl.textAlignment = NSTextAlignmentCenter;
+    }
+    return _tmpLbl;
+}
+
+#pragma mark--天气情况
+- (UILabel *)nowSun{
+    if (_nowSun == nil) {
+        _nowSun = [[UILabel alloc] initWithFrame:CGRectMake(50, 220, KViewWidth - 100 , 30)];
+        _nowSun.backgroundColor = [UIColor colorWithRed:0.26 green:0.44 blue:0.43 alpha:0.55];
+        _nowSun.font = [UIFont systemFontOfSize:17];
+        _nowSun.adjustsFontSizeToFitWidth = YES;
+        _nowSun.textAlignment = NSTextAlignmentCenter;
+        _nowSun.layer.cornerRadius = 5;
+        _nowSun.clipsToBounds = YES;
+    }
+    return _nowSun;
+}
+#pragma mark--懒加载天气空气质量
+- (UIButton *)aqiCity{
+    if (_aqiCity == nil) {
+        _aqiCity = [UIButton buttonWithType:UIButtonTypeCustom];
+        _aqiCity.frame = CGRectMake(KViewWidth / 2 -50, 270, 100 , 20);
+    }
+    return _aqiCity;
+}
 #pragma mark--为ScrollView添加子视图
 - (void)addSubView{
 
@@ -72,12 +117,10 @@
         subView.backgroundColor = [UIColor colorWithRed:arc4random() % 256 / 255.0 green:arc4random() % 256 / 255.0 blue:arc4random() % 256 / 255.0 alpha:.5];
         [self.upScrollVw addSubview:subView];
     }
-    UIImageView * imgView = [[UIImageView alloc] initWithFrame:CGRectMake(KViewWidth / 2 -50, 20, 100 , 100)];
-    [imgView sd_setImageWithURL:[NSURL URLWithString:@"http://files.heweather.com/cond_icon/100.png"]];
 
-//    UILabel * tmpLbl = [UILabel alloc] initWithFrame:CGRectMake(<#CGFloat x#>, <#CGFloat y#>, <#CGFloat width#>, <#CGFloat height#>)
-    [self.upScrollVw addSubview:imgView];
-    
+    [self.upScrollVw addSubview:self.codeImgView];
+    [self.upScrollVw addSubview:self.tmpLbl];
+    [self.upScrollVw addSubview:self.nowSun];
     
 }
 
@@ -131,7 +174,7 @@
 }
 #pragma mark--下载数据
 - (void)downLoadData{
-    NSDictionary * dicts = @{@"cityid":@"CN101030400",@"key":@"5d2fecb1e50a4b788d3d87c1f113a7f5"};
+    NSDictionary * dicts = @{@"city":@"beijing",@"key":@"5d2fecb1e50a4b788d3d87c1f113a7f5"};
     [[HTRequestManager shareManager] requestDataWithUrl:CityUrl withParameters:dicts withComplicate:^(BOOL isSuccess, id Data) {
         if (isSuccess) {
             debugLog(@"%@",Data);
@@ -142,6 +185,24 @@
             [self.btmTableVw reloadData];
             ///
             [self.hourCollVw reloadData];
+            
+            //为控件赋值
+            [self.codeImgView sd_setImageWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"http://files.heweather.com/cond_icon/%@.png", [[[self.models now] cond] code]]]];
+            self.tmpLbl.text = [NSString stringWithFormat:@"%@℃",[[self.models now] tmp]];
+            
+            for (int i = 0; i < [[[[self.models now] wind] sc] length]; i++ ) {
+                unichar c = [[[[self.models now] wind] sc] characterAtIndex:i];
+                if (isdigit(c)) {//如果包含数字
+                    self.nowSun.text = [NSString stringWithFormat:@"%@ | 体感：%@℃ | 湿度：%@%@ | %@ | %@级", [[[self.models now] cond] txt], [[self.models now] fl], [[self.models now] hum], @"%", [[[self.models now] wind] dir], [[[self.models now] wind] sc]];
+                    break;
+                }
+                if (i == [[[[self.models now] wind] sc] length] - 1) {
+                     self.nowSun.text = [NSString stringWithFormat:@"%@ | 体感：%@℃ | 湿度：%@%@ | %@ | %@", [[[self.models now] cond] txt], [[self.models now] fl], [[self.models now] hum],@"%", [[[self.models now] wind] dir], [[[self.models now] wind] sc]];
+                }
+            }
+
+            
+            
         }else{
             debugLog(@"错误信息：%@",Data);
         }
@@ -217,8 +278,10 @@
 - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath{
 
     HTHourForcastCell * itemCell = [collectionView dequeueReusableCellWithReuseIdentifier:hourForcastID forIndexPath:indexPath];
-    itemCell.backgroundColor = [UIColor purpleColor];
+    itemCell.backgroundColor = [UIColor colorWithRed:0.80 green:0.67 blue:0.84 alpha:1.00];
+    itemCell.alpha = 0.5;
     itemCell.hourModel = [[self.models hourly_forecast] objectAtIndex:indexPath.item];
+
     return itemCell;
 }
 - (UIEdgeInsets)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout *)collectionViewLayout insetForSectionAtIndex:(NSInteger)section{
